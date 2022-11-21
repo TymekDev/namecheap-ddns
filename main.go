@@ -49,7 +49,6 @@ func main() {
 	}
 
 	log.Println("INFO", "starting...")
-	round()
 	for range time.Tick(*interval) {
 		round()
 	}
