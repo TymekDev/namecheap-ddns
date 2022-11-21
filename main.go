@@ -1,11 +1,10 @@
 package main
 
 import (
+	"log"
 	"os"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/pflag"
 )
 
@@ -18,29 +17,38 @@ func main() {
 	interval := pflag.Duration("interval", 30*time.Second, "time between subsequent IP update requests")
 	pflag.Parse()
 
-	const timeFormat = "2006-01-02 15:04 -0700"
-	zerolog.TimeFieldFormat = timeFormat
-	log.Logger = log.Output(zerolog.ConsoleWriter{TimeFormat: timeFormat, Out: os.Stderr})
-
-	if *password == "" {
-		log.Fatal().Msg("missing password")
+	ok := true
+	if len(*hosts) == 0 {
+		ok = false
+		log.Println("ERROR", "missing hosts")
 	}
 	if *domain == "" {
-		log.Fatal().Msg("missing domain name")
+		ok = false
+		log.Println("ERROR", "missing domain name")
 	}
-	if len(*hosts) == 0 {
-		log.Fatal().Msg("missing hosts")
+	if *password == "" {
+		ok = false
+		log.Println("ERROR", "missing password")
 	}
+	if !ok {
+		os.Exit(1)
+	}
+
+	log.Println("INFO", "picked up hosts:", *hosts)
+	log.Println("INFO", "picked up domain:", *domain)
+	log.Println("INFO", "picked up password")
+	log.Println("INFO", "picked up interval:", *interval)
 
 	round := func() {
 		for _, host := range *hosts {
+			log.Printf("INFO updating (host: %s, domain: %d)\n", host, domain)
 			if err := updateIP(host, *domain, *password); err != nil {
-				log.Error().Err(err).Send()
+				log.Println("ERROR", err)
 			}
 		}
 	}
 
-	log.Info().Strs("hosts", *hosts).Str("domain", *domain).Dur("interval", *interval).Msg("starting...")
+	log.Println("INFO", "starting...")
 	round()
 	for range time.Tick(*interval) {
 		round()

@@ -1,9 +1,8 @@
 package main
 
 import (
+	"log"
 	"net/http"
-
-	"github.com/rs/zerolog/log"
 )
 
 func updateIP(host, domain, password string) error {
@@ -37,7 +36,7 @@ func sendRequest(req *http.Request) error {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Error().Err(err).Send()
+			log.Println("ERROR", err)
 		}
 	}()
 
