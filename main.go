@@ -2,43 +2,26 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"time"
+
+	"github.com/spf13/pflag"
 )
 
 // Reference: https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-to-dynamically-update-the-hosts-ip-with-an-http-request/
 
 func main() {
-	req, err := http.NewRequest("GET", "https://dynamicdns.park-your-domain.com/update", nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	hosts := pflag.StringSlice("host", nil, "hosts (subdomains) to be updated")
+	domain := pflag.String("domain", "", "domain to be updated")
+	password := pflag.String("password", "", "password to be used")
+	interval := pflag.Duration("interval", 30*time.Second, "time between subsequent IP update requests")
+	pflag.Parse()
 
-	q := req.URL.Query()
-	q.Add("host", "")     // TODO: to flag
-	q.Add("domain", "")   // TODO: to flag
-	q.Add("password", "") // TODO: to flag
-	req.URL.RawQuery = q.Encode()
-
-	if err := send(req); err != nil {
-		log.Fatalln("Error:", err)
-	}
-}
-
-func send(req *http.Request) error {
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Println(err)
+	log.Println("starting with interval", *interval)
+	for range time.Tick(*interval) {
+		for _, host := range *hosts {
+			if err := updateIP(host, *domain, *password); err != nil {
+				log.Println(err)
+			}
 		}
-	}()
-
-	result, err := parse(resp.Body)
-	if err != nil {
-		return err
 	}
-
-	return result
 }
