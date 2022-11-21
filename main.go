@@ -14,7 +14,7 @@ func main() {
 	hosts := pflag.StringSlice("host", nil, "hosts (subdomains) to be updated")
 	domain := pflag.String("domain", "", "domain name to be updated")
 	password := pflag.String("password", "", "password to be used")
-	interval := pflag.Duration("interval", 30*time.Second, "time between subsequent IP update requests")
+	interval := pflag.Duration("interval", 30*time.Minute, "time between subsequent IP update requests")
 	pflag.Parse()
 
 	ok := true
