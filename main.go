@@ -41,7 +41,7 @@ func main() {
 
 	round := func() {
 		for _, host := range *hosts {
-			log.Printf("INFO updating (host: %s, domain: %d)\n", host, domain)
+			log.Printf("INFO updating (host: %s, domain: %s)\n", host, *domain)
 			if err := updateIP(host, *domain, *password); err != nil {
 				log.Println("ERROR", err)
 			}
