@@ -1,4 +1,4 @@
-module git.sr.ht/~tymek/rpi-ddns-updater
+module git.sr.ht/~tymek/namecheap-ddns
 
 go 1.19
 
