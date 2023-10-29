@@ -1,4 +1,4 @@
-module git.sr.ht/~tymek/namecheap-ddns
+module github.com/TymekDev/namecheap-ddns-updater
 
 go 1.19
 
